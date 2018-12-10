@@ -163,6 +163,28 @@ export class TypeScriptPlugin {
         }
       }
     }
+
+    if (this.serverless.service.package.individually) {
+        const functionNames = this.serverless.service.getAllFunctions()
+        for (const name of functionNames) {
+            if (this.serverless.service.functions[name].package.include.length > 0) {
+                const files = await globby(this.serverless.service.functions[name].package.include)
+
+                for (const filename of files) {
+                    const destFileName = path.resolve(path.join(buildFolder, filename))
+                    const dirname = path.dirname(destFileName)
+
+                    if (!fs.existsSync(dirname)) {
+                        fs.mkdirpSync(dirname)
+                    }
+
+                    if (!fs.existsSync(destFileName)) {
+                        fs.copySync(path.resolve(filename), path.resolve(path.join(buildFolder, filename)))
+                    }
+                }
+            }
+        }
+    }
   }
 
   async moveArtifacts(): Promise<void> {
