@@ -167,8 +167,9 @@ export class TypeScriptPlugin {
     if (this.serverless.service.package.individually) {
         const functionNames = this.serverless.service.getAllFunctions()
         for (const name of functionNames) {
-            if (this.serverless.service.functions[name].package.include.length > 0) {
-                const files = await globby(this.serverless.service.functions[name].package.include)
+            const includes = this.serverless.service.functions[name].package.include
+            if (includes && includes.length > 0) {
+                const files = await globby(includes)
 
                 for (const filename of files) {
                     const destFileName = path.resolve(path.join(buildFolder, filename))
